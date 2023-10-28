@@ -1,6 +1,6 @@
 ###  MySQL должен быть установлен из стандартного репозитория с помощью менеджера пакетов apt (пакет mysql-server).
 
-sudo apt update && sudo apt install mysql-server
+sudo apt update && sudo apt install mysql-server -y
 
 ### В MySQL должен быть создан отдельный пользователь exporter с паролем Pa$$W0rd.
 
@@ -12,8 +12,6 @@ GRANT ALL PRIVILEGES ON *.* TO 'exporter'@'localhost';
 
 FLUSH PRIVILEGES;
 EXIT;
-
-
 
 
 ### Установка mysqld_exporter
@@ -59,23 +57,17 @@ EOF
 
 ### Добавьте секцию scrape_configs для node_exporter
 
-sudo cat << EOF >> /opt/prometheus/prometheus.yml
+vi /opt/prometheus/prometheus.yml
   - job_name: 'mysql_exporter'
     scrape_interval: 5s
     static_configs:
-      - targets: ['localhost:9104']
-EOF
+      - targets: ['localhost:9111']
 
-
-
-
-
-
+systemctl daemon-reload 
 
 sudo systemctl restart prometheus
 
 sudo systemctl start mysqld_exporter && \
 sudo systemctl enable mysqld_exporter
-
 sudo systemctl status mysqld_exporter
 

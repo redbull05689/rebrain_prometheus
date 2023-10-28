@@ -37,7 +37,7 @@ sudo mkdir -p /var/lib/prometheus/data && \
 sudo chown -R monitoring:monitoring /var/lib/prometheus
 
 
-mv  /opt/prometheus/prometheus.yml /opt/prometheus/prometheus.yml.example
+cp /opt/prometheus/prometheus.yml /opt/prometheus/prometheus.yml.example
 cat > /opt/prometheus/prometheus.yml << EOF
 global:
   scrape_interval: 15s
@@ -90,7 +90,10 @@ systemctl status prometheus
 
 
 
-./promtool query instant http://localhost:9090/ 'sum(irate(node_cpu_seconds_total{mode="user"}[5m])) * 100' > /tmp/query1.txt
+echo 'sum(irate(node_cpu_seconds_total{mode="user"}[5m])) * 100' > /tmp/query1.txt
 
 
-./promtool query instant http://localhost:9090/ '(1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100' > /tmp/query2.txt
+echo '100 * (1 - node_filesystem_avail_bytes{fstype!="rootfs"} / node_filesystem_size_bytes{fstype!="rootfs"})' > /tmp/query2.txt
+
+
+echo '100 * (1 - node_filesystem_avail_bytes{mountpoint="/", fstype!="rootfs"} / node_filesystem_size_bytes{fstype!="rootfs"})' > /tmp/query2.txt
